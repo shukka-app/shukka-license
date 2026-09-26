@@ -16,7 +16,7 @@ Fingerprint = Annotated[str, BeforeValidator(str.strip), Field(min_length=1, max
 _reject_null = ProhibitNullCharactersValidator()
 
 
-class Empty(Schema):
+class StrictInput(Schema):
     model_config = ConfigDict(extra="forbid", strict=True)
 
     @field_validator("*", mode="after", check_fields=False)
@@ -27,21 +27,24 @@ class Empty(Schema):
         return value
 
 
-class Credentials(Empty):
+Empty = StrictInput  # no-body endpoints
+
+
+class Credentials(StrictInput):
     username: str
     password: str
 
 
-class ProductCreate(Empty):
+class ProductCreate(StrictInput):
     code: ProductCode
     name: ProductName
 
 
-class ProductUpdate(Empty):
+class ProductUpdate(StrictInput):
     name: ProductName = ""
 
 
-class KeyIssue(Empty):
+class KeyIssue(StrictInput):
     product_id: int
     max_devices: int = Field(ge=1)
     expires_at: (
@@ -49,19 +52,19 @@ class KeyIssue(Empty):
     ) = None
 
 
-class EntitlementStatus(Empty):
+class EntitlementStatus(StrictInput):
     status: Literal["active", "suspended", "revoked"]
 
 
-class Redeem(Empty):
+class Redeem(StrictInput):
     license_key: str
 
 
-class DeviceName(Empty):
+class DeviceName(StrictInput):
     display_name: Annotated[str, Field(min_length=1, max_length=200)] | None
 
 
-class DeviceBind(Empty):
+class DeviceBind(StrictInput):
     device_fingerprint: Fingerprint
     display_name: Annotated[str, Field(min_length=1, max_length=200)] | None = None
 

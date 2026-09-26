@@ -45,9 +45,7 @@ def bind(entitlement, fingerprint, display_name=None, *, source_key_id=None):
             return existing, False
         if locked.devices.filter(status="bound").count() >= locked.max_devices:
             raise SeatExhausted()
-        from licenses import services as license_services
-
-        budget = max(license_services.DEVICE_HISTORY_LIMIT, locked.max_devices)
+        budget = max(DEVICE_HISTORY_LIMIT, locked.max_devices)
         excess = locked.devices.count() - budget + 1
         if excess > 0:
             stale_ids = list(
